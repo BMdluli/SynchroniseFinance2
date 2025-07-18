@@ -1,18 +1,39 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+  url      = "file:./dev.db"
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   username  String
-  email String  @unique
-  password String 
+  email     String    @unique
+  password  String
+
+  savings   Saving[]
+}
+
+model Saving {
+  id                 Int            @id @default(autoincrement())
+  name               String
+  targetAmount       Decimal
+  contributedAmount  Decimal
+  targetDate         DateTime
+
+  userId             Int
+  user               User           @relation(fields: [userId], references: [id])
+
+  contributions      Contribution[]
+}
+
+model Contribution {
+  id         Int       @id @default(autoincrement())
+  amount     Decimal
+  date       DateTime  @default(now())
+
+  savingId   Int
+  saving     Saving     @relation(fields: [savingId], references: [id])
 }
