@@ -31,7 +31,7 @@ export const getSaving = async (savingId: number, userId: number) => {
   if (!saving) return null;
   console.log("GET SAVING _> ", saving);
 
-  return saving;
+  if (saving.contributions) return saving;
 };
 
 export const deleteSaving = async (savingId: number, userId: number) => {

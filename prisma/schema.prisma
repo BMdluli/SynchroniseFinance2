@@ -35,5 +35,5 @@ model Contribution {
   date       DateTime  @default(now())
 
   savingId   Int
-  saving     Saving     @relation(fields: [savingId], references: [id])
+  saving    Saving   @relation(fields: [savingId], references: [id], onDelete: Cascade)
 }

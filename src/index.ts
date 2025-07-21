@@ -1,8 +1,10 @@
 import express from "express";
-import userRoutes from "./interfaces/routes/userRoutes";
-import savingRoutes from "./interfaces/routes/savingRoutes";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+
+import userRoutes from "./interfaces/routes/userRoutes";
+import savingRoutes from "./interfaces/routes/savingRoutes";
+import contributionRoutes from "./interfaces/routes/contributionRoutes";
 
 dotenv.config();
 
@@ -12,6 +14,7 @@ app.use(cookieParser());
 
 app.use("/", userRoutes);
 app.use("/", savingRoutes);
+app.use("/", contributionRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

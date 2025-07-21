@@ -4,6 +4,7 @@ export class SavingRepository {
   async getAll(userId: number) {
     return await prisma.saving.findMany({
       where: { userId },
+      include: { contributions: true },
     });
   }
 
@@ -13,6 +14,7 @@ export class SavingRepository {
         userId,
         id: savingId,
       },
+      include: { contributions: true },
     });
   }
 

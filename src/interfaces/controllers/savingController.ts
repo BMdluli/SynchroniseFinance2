@@ -24,13 +24,13 @@ export const createSavingHandler = async (req: any, res: Response) => {
       });
     }
 
-    const { name, targetAmount, contributedAmount, targetDate } = parsed.data;
+    const { name, targetAmount, targetDate } = parsed.data;
     const userId = req.userInfo?.id;
 
     const savingData: CreateSavingDto = {
       name,
       targetAmount,
-      contributedAmount,
+      contributedAmount: 0,
       targetDate,
       userId,
     };
@@ -166,6 +166,7 @@ export const deleteSavingHandler = async (req: any, res: Response) => {
     }
 
     console.log(convertedSavingsId);
+    console.log(req.userInfo.id);
     const result = await deleteSaving(convertedSavingsId, req.userInfo.id);
 
     if (!result) {
