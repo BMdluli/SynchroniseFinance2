@@ -18,27 +18,7 @@ export const addContribution = async (contributionData: {
     throw new Error(
       `Saving with ID ${contributionData.savingId} not found for user`
     );
-    // or throw new NotFoundError('Saving not found');
   }
-
-  // const contributions = saving.contributions;
-  // let sum = 0;
-
-  // if (contributions.length > 0) {
-  //   for (let i = 0; i < contributions.length; i++) {
-  //     sum += +contributions[i].amount;
-  //   }
-  // }
-
-  // console.log("Target ammoun === ", +saving.targetAmount);
-  // console.log("Contribution ammoun === ", contributionData.amount);
-
-  // if (
-  //   contributionData.amount > +saving.targetAmount - sum ||
-  //   contributionData.amount > +saving.targetAmount
-  // ) {
-  //   throw new Error(`Contribution can not exceed target amount`);
-  // }
 
   const contributedAmount = saving.contributedAmount;
   const amountToAdd = contributionData.amount;

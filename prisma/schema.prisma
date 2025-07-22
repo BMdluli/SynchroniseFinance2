@@ -14,13 +14,14 @@ model User {
   password  String
 
   savings   Saving[]
+  portfolios  Portfolio[]
 }
 
 model Saving {
   id                 Int            @id @default(autoincrement())
   name               String
   targetAmount       Decimal
-  contributedAmount  Decimal
+  contributedAmount  Decimal        @default(0)
   targetDate         DateTime
 
   userId             Int
@@ -36,4 +37,29 @@ model Contribution {
 
   savingId   Int
   saving    Saving   @relation(fields: [savingId], references: [id], onDelete: Cascade)
+}
+
+model Portfolio {
+  id          Int @id @default(autoincrement())
+  name        String
+  createdAt   DateTime @default(now())
+
+  userId      Int
+  user        User  @relation(fields: [userId], references: [id])
+
+  stockId     Int
+  stocks      Stock[]
+}
+
+model Stock {
+  id                  Int @id @default(autoincrement())
+  symbol              String
+  companyName         String
+  purchacePrice       Decimal
+  imageUrl            String
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime
+
+  portfolioId         Int
+  portfolio           Portfolio  @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
 }
