@@ -47,7 +47,6 @@ model Portfolio {
   userId      Int
   user        User  @relation(fields: [userId], references: [id])
 
-  stockId     Int
   stocks      Stock[]
 }
 
@@ -56,9 +55,10 @@ model Stock {
   symbol              String
   companyName         String
   purchacePrice       Decimal
+  shares              Int
   imageUrl            String
   createdAt           DateTime  @default(now())
-  updatedAt           DateTime
+  updatedAt           DateTime  @default(now())
 
   portfolioId         Int
   portfolio           Portfolio  @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
