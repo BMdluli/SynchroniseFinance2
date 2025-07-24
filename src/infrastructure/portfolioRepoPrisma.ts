@@ -8,10 +8,14 @@ export class PortfolioRepository {
   }
 
   async findPortfolioById(id: number, userId: number) {
-    return await prisma.portfolio.findUnique({
-      where: { id, userId },
-      //   include: { user: true },
-      include: { stocks: true },
+    return await prisma.portfolio.findFirst({
+      where: {
+        id,
+        userId,
+      },
+      include: {
+        stocks: true,
+      },
     });
   }
 

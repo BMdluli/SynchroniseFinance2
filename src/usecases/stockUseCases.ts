@@ -25,10 +25,12 @@ export const createUserStock = async (
     );
   }
 
-  const white_listed_emails = [process.env.WHITELIST_EMAIL];
+  const whitelistedEmails = (process.env.WHITELIST_EMAIL || "").split(",");
 
-  if (portfolio.stocks.length + 1 > 3 || white_listed_emails.includes(email)) {
-    throw new Error("Only premium users can have more that 3 stocks");
+  const isPremiumUser = whitelistedEmails.includes(email);
+
+  if (!isPremiumUser && portfolio.stocks.length >= 3) {
+    throw new Error("Only premium users can have more than 3 stocks");
   }
 
   const profileURL = `https://financialmodelingprep.com/stable/profile?symbol=${stockData.symbol}&apikey=${process.env.FMP_API_KEY}`;

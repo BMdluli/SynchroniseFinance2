@@ -52,7 +52,7 @@ model Portfolio {
 
 model Stock {
   id             Int      @id @default(autoincrement())
-  symbol         String   @unique
+  symbol         String
   companyName    String
   purchasePrice  Decimal  
   shares         Int
@@ -62,5 +62,7 @@ model Stock {
 
   portfolioId    Int
   portfolio      Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@unique([symbol, portfolioId]) 
 }
 

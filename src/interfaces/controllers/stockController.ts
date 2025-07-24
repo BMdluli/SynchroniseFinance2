@@ -1,6 +1,9 @@
 import { Response } from "express";
 import { CreateStockSchema } from "../../validators/CreateStockSchema";
 import { createUserStock, getUserStocks } from "../../usecases/stockUseCases";
+import { PortfolioRepository } from "../../infrastructure/portfolioRepoPrisma";
+
+const portfolioRepo = new PortfolioRepository();
 
 export const createStockHandler = async (req: any, res: Response) => {
   try {
@@ -50,6 +53,7 @@ export const createStockHandler = async (req: any, res: Response) => {
 
 export const getStocksHandler = async (req: any, res: Response) => {
   try {
+    const userId = req.userInfo?.id;
     const { portfolioId } = req.body;
 
     if (!portfolioId || isNaN(portfolioId)) {
@@ -59,7 +63,19 @@ export const getStocksHandler = async (req: any, res: Response) => {
       });
     }
 
-    const stocks = await getUserStocks(portfolioId);
+    const portfolio = await portfolioRepo.findPortfolioById(
+      Number(portfolioId),
+      userId
+    );
+
+    if (!portfolio) {
+      return res.status(403).json({
+        status: "fail",
+        message: "You do not have access to this portfolio",
+      });
+    }
+
+    const stocks = await getUserStocks(portfolio.id);
 
     return res.status(200).json({
       status: "success",
@@ -72,8 +88,6 @@ export const getStocksHandler = async (req: any, res: Response) => {
         imageUrl: stock.imageUrl,
         portfolioId: stock.portfolioId,
         currentPrice: stock.currentPrice,
-        // priceChange: stock.priceChange,
-        // priceChangePercentage: stock.priceChangePercentage,
       })),
     });
   } catch (error: any) {
