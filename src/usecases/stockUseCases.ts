@@ -97,3 +97,21 @@ export const getUserStocks = async (portfolioId: number) => {
     };
   });
 };
+
+export const deleteUserStock = async (
+  userId: number,
+  stockId: number
+): Promise<boolean> => {
+  const stock = await stockRepo.getStockById(stockId);
+
+  if (!stock) {
+    throw new Error("Stock not found");
+  }
+
+  if (stock.portfolio.userId !== userId) {
+    throw new Error("You do not have permission to delete this stock");
+  }
+
+  await stockRepo.deleteStock(stockId);
+  return true;
+};

@@ -1,6 +1,10 @@
 import { Response } from "express";
 import { CreateStockSchema } from "../../validators/CreateStockSchema";
-import { createUserStock, getUserStocks } from "../../usecases/stockUseCases";
+import {
+  createUserStock,
+  deleteUserStock,
+  getUserStocks,
+} from "../../usecases/stockUseCases";
 import { PortfolioRepository } from "../../infrastructure/portfolioRepoPrisma";
 
 const portfolioRepo = new PortfolioRepository();
@@ -96,5 +100,32 @@ export const getStocksHandler = async (req: any, res: Response) => {
       status: "fail",
       message: error.message || "Failed to fetch stocks",
     });
+  }
+};
+
+export const deleteStockHandler = async (req: any, res: Response) => {
+  try {
+    const stockId = Number(req.params.stockId);
+    const userId = req.userInfo?.id;
+
+    if (!stockId || isNaN(stockId)) {
+      return res
+        .status(400)
+        .json({ status: "fail", message: "Invalid stock ID" });
+    }
+
+    await deleteUserStock(userId, stockId);
+
+    return res.status(204).send(); // No Content
+  } catch (error: any) {
+    if (error.message.includes("permission")) {
+      return res.status(403).json({ status: "fail", message: error.message });
+    }
+
+    if (error.message.includes("not found")) {
+      return res.status(404).json({ status: "fail", message: error.message });
+    }
+
+    return res.status(500).json({ status: "fail", message: error.message });
   }
 };
