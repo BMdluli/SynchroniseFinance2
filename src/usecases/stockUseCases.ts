@@ -5,9 +5,23 @@ import { StockRepository } from "../infrastructure/stockRepoPrisma";
 import axios from "axios";
 import { stockCache } from "../utils/cache";
 import { CompanyPortfolio } from "../domain/CompanyPortfolio";
+import { Stock } from "../domain/Stock";
 
 const stockRepo = new StockRepository();
 const portfolioRepo = new PortfolioRepository();
+
+const getCompanyProfile = async (inputData: Partial<CreateStockDto>) => {
+  const profileURL = `https://financialmodelingprep.com/stable/profile?symbol=${inputData.symbol}&apikey=${process.env.FMP_API_KEY}`;
+  const profileRes = await axios.get<CompanyPortfolio[]>(profileURL);
+
+  if (!profileRes.data || profileRes.data.length === 0) {
+    throw new Error(`Stock with symbol '${inputData.symbol}' not found`);
+  }
+
+  const profile = profileRes.data[0];
+
+  return profile;
+};
 
 export const createUserStock = async (
   stockData: CreateStockDto,
@@ -33,14 +47,7 @@ export const createUserStock = async (
     throw new Error("Only premium users can have more than 3 stocks");
   }
 
-  const profileURL = `https://financialmodelingprep.com/stable/profile?symbol=${stockData.symbol}&apikey=${process.env.FMP_API_KEY}`;
-  const profileRes = await axios.get<CompanyPortfolio[]>(profileURL);
-
-  if (!profileRes.data || profileRes.data.length === 0) {
-    throw new Error(`Stock with symbol '${stockData.symbol}' not found`);
-  }
-
-  const profile = profileRes.data[0];
+  const profile = await getCompanyProfile(stockData);
 
   const stockToCreate = {
     ...stockData,
@@ -96,6 +103,51 @@ export const getUserStocks = async (portfolioId: number) => {
       priceChangePercentage: quote?.changesPercentage ?? null,
     };
   });
+};
+
+export const getUserStock = async (userId: number, stockId: number) => {
+  const stock = await stockRepo.getStockById(stockId);
+
+  if (!stock) {
+    throw new Error("Stock not found");
+  }
+
+  if (stock.portfolio.userId !== userId) {
+    throw new Error("Unauthorized access to stock");
+  }
+
+  return stock;
+};
+
+export const updateUserStock = async (
+  userId: number,
+  stockId: number,
+  updateData: Partial<CreateStockDto>
+) => {
+  const stock = await stockRepo.getStockById(stockId);
+
+  if (!stock) {
+    throw new Error("Stock not found");
+  }
+
+  if (stock.portfolio.userId !== userId) {
+    throw new Error("Unauthorized access to stock");
+  }
+
+  let stockToUpdate = {};
+
+  // TODO: -> refactor
+  if (updateData.symbol) {
+    const profile = await getCompanyProfile(updateData);
+
+    stockToUpdate = {
+      ...updateData,
+      companyName: profile.companyName,
+      imageUrl: profile.image,
+    };
+  }
+
+  return await stockRepo.updateStock(stockId, stockToUpdate);
 };
 
 export const deleteUserStock = async (

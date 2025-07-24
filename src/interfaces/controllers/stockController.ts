@@ -3,7 +3,9 @@ import { CreateStockSchema } from "../../validators/CreateStockSchema";
 import {
   createUserStock,
   deleteUserStock,
+  getUserStock,
   getUserStocks,
+  updateUserStock,
 } from "../../usecases/stockUseCases";
 import { PortfolioRepository } from "../../infrastructure/portfolioRepoPrisma";
 
@@ -100,6 +102,42 @@ export const getStocksHandler = async (req: any, res: Response) => {
       status: "fail",
       message: error.message || "Failed to fetch stocks",
     });
+  }
+};
+
+export const getStockHandler = async (req: any, res: Response) => {
+  try {
+    const stockId = Number(req.params.stockId);
+    const userId = req.userInfo?.id;
+
+    const stock = await getUserStock(userId, stockId);
+
+    return res.status(200).json({
+      status: "success",
+      data: stock,
+    });
+  } catch (error: any) {
+    const code = error.message.includes("Unauthorized") ? 403 : 404;
+    return res.status(code).json({ status: "fail", message: error.message });
+  }
+};
+
+export const updateStockHandler = async (req: any, res: Response) => {
+  try {
+    const stockId = Number(req.params.stockId);
+    const userId = req.userInfo?.id;
+
+    const updateFields = req.body;
+
+    const updated = await updateUserStock(userId, stockId, updateFields);
+
+    return res.status(200).json({
+      status: "success",
+      data: updated,
+    });
+  } catch (error: any) {
+    const code = error.message.includes("Unauthorized") ? 403 : 404;
+    return res.status(code).json({ status: "fail", message: error.message });
   }
 };
 

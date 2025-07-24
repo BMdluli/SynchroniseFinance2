@@ -39,19 +39,25 @@ export class StockRepository {
       );
     }
   }
-
-  async deleteStock(stockId: number) {
-    return await prisma.stock.delete({
-      where: { id: stockId },
-    });
-  }
-
   async getStockById(stockId: number) {
     return await prisma.stock.findUnique({
       where: { id: stockId },
       include: {
         portfolio: true,
       },
+    });
+  }
+
+  async updateStock(stockId: number, data: Partial<Stock>) {
+    return await prisma.stock.update({
+      where: { id: stockId },
+      data,
+    });
+  }
+
+  async deleteStock(stockId: number) {
+    return await prisma.stock.delete({
+      where: { id: stockId },
     });
   }
 }
