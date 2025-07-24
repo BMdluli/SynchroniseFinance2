@@ -11,6 +11,7 @@ export class PortfolioRepository {
     return await prisma.portfolio.findUnique({
       where: { id, userId },
       //   include: { user: true },
+      include: { stocks: true },
     });
   }
 

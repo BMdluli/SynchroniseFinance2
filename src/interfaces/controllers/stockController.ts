@@ -1,8 +1,6 @@
 import { Response } from "express";
 import { CreateStockSchema } from "../../validators/CreateStockSchema";
-import axios from "axios";
-import { Quote } from "../../domain/Quote";
-import { createUserStock } from "../../usecases/stockUseCases";
+import { createUserStock, getUserStocks } from "../../usecases/stockUseCases";
 
 export const createStockHandler = async (req: any, res: Response) => {
   try {
@@ -15,42 +13,74 @@ export const createStockHandler = async (req: any, res: Response) => {
         errors: parsed.error.flatten(),
       });
     }
-    const { symbol, shares, purchacePrice, portfolioId } = parsed.data;
 
-    // get stock associated with symbol
-    const quoteURL = `https://financialmodelingprep.com/stable/profile?symbol=${req.body.symbol}&apikey=${process.env.FMP_API_KEY}`;
-
-    const qoute = await axios.get<Quote[]>(quoteURL);
-
-    if (qoute.data.length < 0) {
-      return res.status(404).json({
+    if (!req.userInfo?.id) {
+      return res.status(401).json({
         status: "fail",
-        message: `Stock with the symbol of ${symbol} not found`,
+        message: "Unauthorized: User information missing",
       });
     }
 
-    const qouteItem = qoute.data[0];
+    console.log(req.userInfo);
 
-    const formatedStock = {
-      symbol: symbol,
-      shares: shares,
-      companyName: qouteItem.companyName,
-      purchacePrice: purchacePrice,
-      imageUrl: qouteItem.image,
-      portfolioId: portfolioId,
-    };
+    const stock = await createUserStock(
+      parsed.data,
+      req.userInfo.id,
+      req.userInfo.email
+    );
 
-    const stock = await createUserStock(formatedStock);
-
-    res.status(201).json({
-      status: "successs",
+    return res.status(201).json({
+      status: "success",
       data: stock,
     });
-  } catch (e: any) {
-    console.log(e);
-    res.status(500).json({
+  } catch (error: any) {
+    console.error("Error creating stock:", error);
+    if (error.message.includes("Stock with symbol")) {
+      return res.status(404).json({ status: "fail", message: error.message });
+    }
+    if (error.message.includes("portfolio")) {
+      return res.status(404).json({ status: "fail", message: error.message });
+    }
+    return res.status(400).json({
       status: "fail",
-      message: "Something went wrong",
+      message: error.message,
+    });
+  }
+};
+
+export const getStocksHandler = async (req: any, res: Response) => {
+  try {
+    const { portfolioId } = req.body;
+
+    if (!portfolioId || isNaN(portfolioId)) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Please provide a valid portfolio ID",
+      });
+    }
+
+    const stocks = await getUserStocks(portfolioId);
+
+    return res.status(200).json({
+      status: "success",
+      data: stocks.map((stock) => ({
+        id: stock.id,
+        symbol: stock.symbol,
+        companyName: stock.companyName,
+        purchasePrice: stock.purchasePrice,
+        shares: stock.shares,
+        imageUrl: stock.imageUrl,
+        portfolioId: stock.portfolioId,
+        currentPrice: stock.currentPrice,
+        // priceChange: stock.priceChange,
+        // priceChangePercentage: stock.priceChangePercentage,
+      })),
+    });
+  } catch (error: any) {
+    console.error("Error fetching stocks:", error);
+    return res.status(500).json({
+      status: "fail",
+      message: error.message || "Failed to fetch stocks",
     });
   }
 };
