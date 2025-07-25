@@ -6,6 +6,7 @@ import axios from "axios";
 import { stockCache } from "../utils/cache";
 import { CompanyPortfolio } from "../domain/CompanyPortfolio";
 import { Stock } from "../domain/Stock";
+import { SearchResult } from "../domain/SearchResult";
 
 const stockRepo = new StockRepository();
 const portfolioRepo = new PortfolioRepository();
@@ -166,4 +167,21 @@ export const deleteUserStock = async (
 
   await stockRepo.deleteStock(stockId);
   return true;
+};
+
+export const searchForStock = async (
+  companyName: string
+): Promise<SearchResult[]> => {
+  try {
+    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${encodeURIComponent(
+      companyName
+    )}&limit=10&exchange=NASDAQ&apikey=${process.env.FMP_API_KEY}`;
+
+    const response = await axios.get<SearchResult[]>(apiUrl);
+
+    return response.data;
+  } catch (error: any) {
+    console.error("Search stock error:", error);
+    throw new Error("Failed to search for stocks");
+  }
 };

@@ -5,6 +5,7 @@ import {
   deleteUserStock,
   getUserStock,
   getUserStocks,
+  searchForStock,
   updateUserStock,
 } from "../../usecases/stockUseCases";
 import { PortfolioRepository } from "../../infrastructure/portfolioRepoPrisma";
@@ -165,5 +166,30 @@ export const deleteStockHandler = async (req: any, res: Response) => {
     }
 
     return res.status(500).json({ status: "fail", message: error.message });
+  }
+};
+
+export const searchStockHandler = async (req: any, res: Response) => {
+  try {
+    const query = req.query.q;
+
+    if (!query || typeof query !== "string") {
+      return res.status(400).json({
+        status: "fail",
+        message: "Missing or invalid search query",
+      });
+    }
+
+    const results = await searchForStock(query);
+
+    return res.status(200).json({
+      status: "success",
+      data: results,
+    });
+  } catch (e: any) {
+    return res.status(500).json({
+      status: "fail",
+      message: e.message || "Something went wrong during stock search",
+    });
   }
 };
