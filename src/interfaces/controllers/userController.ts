@@ -7,15 +7,41 @@ import {
   signInUser,
 } from "../../usecases/userUseCases";
 
-const generateToken = (userId: number, email: string) => {
-  // 🔐 Create JWT
+const generateToken = (userId: number, email: string, username: string) => {
   const jwtExpiresIn = "15m";
 
   return jwt.sign(
-    { id: userId, email: email },
+    { id: userId, email: email, username: username },
     process.env.JWT_SECRET as string,
     { expiresIn: jwtExpiresIn }
   );
+};
+
+export const checkAuth = async (req: Request, res: Response) => {
+  try {
+    console.log(req.cookies.access_token);
+    const token = req.cookies.access_token;
+
+    if (!token) {
+      return res
+        .status(401)
+        .json({ authenticated: false, message: "No token provided" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+      id: number;
+      email: string;
+    };
+
+    res.status(200).json({
+      authenticated: true,
+      user: { id: decoded.id, email: decoded.email },
+    });
+  } catch (err) {
+    return res
+      .status(401)
+      .json({ authenticated: false, message: "Invalid or expired token" });
+  }
 };
 
 export const createUserHandler = async (req: Request, res: Response) => {
@@ -31,12 +57,16 @@ export const createUserHandler = async (req: Request, res: Response) => {
 
     const newUser = await createUser({ username, email, password });
 
-    res.cookie("access_token", generateToken(newUser.id, newUser.email), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 15 * 60 * 1000,
-    });
+    res.cookie(
+      "access_token",
+      generateToken(newUser.id, newUser.email, newUser.username),
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 15 * 60 * 1000,
+      }
+    );
 
     res.status(201).json({
       status: "success",
@@ -78,13 +108,17 @@ export const loginUser = async (req: Request, res: Response) => {
       return;
     }
 
-    // 🍪 Set token in cookie
-    res.cookie("access_token", generateToken(userFromDb.id, userFromDb.email), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // true on HTTPS
-      sameSite: "strict",
-      maxAge: 15 * 60 * 1000, // 15 minutes
-    });
+    // Set token in cookie
+    res.cookie(
+      "access_token",
+      generateToken(userFromDb.id, userFromDb.email, userFromDb.username),
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // true on HTTPS
+        sameSite: "strict",
+        maxAge: 15 * 60 * 1000, // 15 minutes
+      }
+    );
 
     res.status(200).json({
       status: "success",
