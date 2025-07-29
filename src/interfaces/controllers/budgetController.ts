@@ -7,6 +7,8 @@ import {
   getBudgets,
   updateBudget,
 } from "../../usecases/budgetUseCase";
+import { copyBudget } from "../../usecases/budgetUseCase";
+import { CopyBudgetSchema } from "../../validators/CopyBudgetSchema";
 
 export const getBudgetsHandler = async (req: any, res: Response) => {
   try {
@@ -160,6 +162,39 @@ export const deleteBudgetHandler = async (req: any, res: Response) => {
     return res.status(204).send(); // 👈 No Content on success
   } catch (e: any) {
     console.error("Delete budget error _>", e);
+    return res.status(400).json({
+      status: "fail",
+      message: e.message || "Something went wrong",
+    });
+  }
+};
+
+export const copyBudgetHandler = async (req: any, res: Response) => {
+  try {
+    const userId = req.userInfo.id;
+    const { budgetId } = req.params;
+    const parsed = CopyBudgetSchema.safeParse(req.body);
+
+    if (!parsed.success) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Invalid input",
+        errors: parsed.error.flatten(),
+      });
+    }
+
+    const copied = await copyBudget(
+      userId,
+      Number(budgetId),
+      parsed.data.newName
+    );
+
+    return res.status(201).json({
+      status: "success",
+      data: copied,
+    });
+  } catch (e: any) {
+    console.error("Copy budget error _>", e);
     return res.status(400).json({
       status: "fail",
       message: e.message || "Something went wrong",

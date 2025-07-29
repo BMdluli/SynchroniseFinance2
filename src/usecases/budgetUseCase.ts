@@ -57,3 +57,32 @@ export const deleteBudget = async (userId: number, budgetId: number) => {
   await budgetRepo.deleteBudget(budgetId);
   return true;
 };
+
+export const copyBudget = async (
+  userId: number,
+  originalBudgetId: number,
+  newName: string
+) => {
+  const original = await budgetRepo.getBudgetWithCategories(
+    originalBudgetId,
+    userId
+  );
+
+  if (!original) {
+    throw new Error("Original budget not found or access denied.");
+  }
+
+  const copied = await budgetRepo.createBudgetWithCategories({
+    name: newName,
+    startDate: original.startDate,
+    endDate: original.endDate,
+    totalIncome: +original.totalIncome,
+    userId: original.userId,
+    categories: original.budgetCategories.map((cat) => ({
+      name: cat.name,
+      amount: +cat.amount,
+    })),
+  });
+
+  return copied;
+};

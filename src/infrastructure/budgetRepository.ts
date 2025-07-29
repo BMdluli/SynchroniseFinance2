@@ -46,4 +46,41 @@ export class BudgetRepository {
       },
     });
   }
+
+  async getBudgetWithCategories(budgetId: number, userId: number) {
+    return await prisma.budget.findFirst({
+      where: {
+        id: budgetId,
+        userId,
+      },
+      include: {
+        budgetCategories: true,
+      },
+    });
+  }
+
+  async createBudgetWithCategories(data: {
+    name: string;
+    startDate: Date;
+    endDate: Date;
+    totalIncome: number;
+    userId: number;
+    categories: { name: string; amount: number }[];
+  }) {
+    return await prisma.budget.create({
+      data: {
+        name: data.name,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        totalIncome: data.totalIncome,
+        userId: data.userId,
+        budgetCategories: {
+          create: data.categories,
+        },
+      },
+      include: {
+        budgetCategories: true,
+      },
+    });
+  }
 }
