@@ -8,6 +8,7 @@ import savingRoutes from "./interfaces/routes/savingRoutes";
 import contributionRoutes from "./interfaces/routes/contributionRoutes";
 import portfolioRoutes from "./interfaces/routes/portfolioRoutes";
 import stockRoutes from "./interfaces/routes/stockRoutes";
+import budgetRoutes from "./interfaces/routes/budgetRoutes";
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use("/", savingRoutes);
 app.use("/", contributionRoutes);
 app.use("/", portfolioRoutes);
 app.use("/", stockRoutes);
+app.use("/", budgetRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

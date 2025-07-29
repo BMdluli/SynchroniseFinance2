@@ -13,8 +13,9 @@ model User {
   email     String    @unique
   password  String
 
-  savings   Saving[]
+  savings     Saving[]
   portfolios  Portfolio[]
+  budgets     Budget[]
 }
 
 model Saving {
@@ -66,3 +67,25 @@ model Stock {
   @@unique([symbol, portfolioId]) 
 }
 
+
+model Budget {
+  id                Int @id @default(autoincrement())
+  name              String
+  startDate         DateTime @default(now())
+  endDate           DateTime @default(now())
+  totalIncome       Decimal
+
+  userId             Int
+  user               User           @relation(fields: [userId], references: [id])
+
+  budgetCategories BudgetCategory[]
+}
+
+model BudgetCategory  {
+  id          Int @id @default(autoincrement())
+  name        String
+  amount      Decimal
+  
+  budgetId    Int
+  budget     Budget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+}
