@@ -8,7 +8,7 @@ import {
 } from "../../usecases/userUseCases";
 
 const generateToken = (userId: number, email: string, username: string) => {
-  const jwtExpiresIn = "15m";
+  const jwtExpiresIn = "60m";
 
   return jwt.sign(
     { id: userId, email: email, username: username },
@@ -64,7 +64,7 @@ export const createUserHandler = async (req: Request, res: Response) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 15 * 60 * 1000,
+        maxAge: 60 * 60 * 1000,
       }
     );
 
@@ -116,7 +116,7 @@ export const loginUser = async (req: Request, res: Response) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production", // true on HTTPS
         sameSite: "strict",
-        maxAge: 15 * 60 * 1000, // 15 minutes
+        maxAge: 60 * 60 * 1000, // 15 minutes
       }
     );
 
