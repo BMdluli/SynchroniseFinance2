@@ -1,3 +1,3 @@
 import NodeCache from "node-cache";
 
-export const stockCache = new NodeCache({ stdTTL: 1800 }); // TTL = 30 minutes
+export const stockCache = new NodeCache({ stdTTL: 3600 }); // TTL = 60 minutes

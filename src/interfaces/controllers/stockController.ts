@@ -9,6 +9,8 @@ import {
   updateUserStock,
 } from "../../usecases/stockUseCases";
 import { PortfolioRepository } from "../../infrastructure/portfolioRepoPrisma";
+import { stockCache } from "../../utils/cache";
+import axios from "axios";
 
 const portfolioRepo = new PortfolioRepository();
 
@@ -190,6 +192,53 @@ export const searchStockHandler = async (req: any, res: Response) => {
     return res.status(500).json({
       status: "fail",
       message: e.message || "Something went wrong during stock search",
+    });
+  }
+};
+
+export const getMarketIndexesHandler = async (req: any, res: Response) => {
+  try {
+    const cacheKey = "market_index_etfs";
+    const cached = stockCache.get(cacheKey);
+    if (cached) {
+      return res.status(200).json({ status: "success", data: cached });
+    }
+
+    const etfSymbols = ["SPY", "QQQ", "DIA"];
+    const url = `https://financialmodelingprep.com/api/v3/quote/${etfSymbols.join(
+      ","
+    )}?apikey=${process.env.FMP_API_KEY}`;
+
+    const response = await axios.get(url);
+    const data = response.data;
+
+    if (!Array.isArray(data) || data.length === 0) {
+      throw new Error("No ETF data received from FMP");
+    }
+
+    const formatted = data.map((item: any) => ({
+      symbol: item.symbol,
+      name:
+        item.symbol === "SPY"
+          ? "S&P 500"
+          : item.symbol === "QQQ"
+          ? "NASDAQ"
+          : "Dow Jones",
+      price: item.price,
+      change: item.change,
+      changePercent: item.changesPercentage,
+    }));
+
+    stockCache.set(cacheKey, formatted); // Cache for 1 hour
+    return res.status(200).json({ status: "success", data: formatted });
+  } catch (error: any) {
+    console.error("Error fetching market ETF data:", error.message);
+    return res.status(500).json({
+      status: "fail",
+      message:
+        error.response?.status === 403
+          ? "FMP API limit reached or unauthorized"
+          : "Failed to fetch ETF market index data",
     });
   }
 };
