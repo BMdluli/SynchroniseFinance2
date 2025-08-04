@@ -63,7 +63,9 @@ export const createStockHandler = async (req: any, res: Response) => {
 export const getStocksHandler = async (req: any, res: Response) => {
   try {
     const userId = req.userInfo?.id;
-    const { portfolioId } = req.body;
+    const { portfolioId } = req.query;
+
+    console.log(req.params);
 
     if (!portfolioId || isNaN(portfolioId)) {
       return res.status(400).json({

@@ -22,7 +22,7 @@ export class PortfolioRepository {
   async getUserPortfolios(userId: number) {
     return await prisma.portfolio.findMany({
       where: { userId },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: "asc" },
     });
   }
 
