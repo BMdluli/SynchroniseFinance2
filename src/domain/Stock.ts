@@ -4,5 +4,6 @@ export interface Stock {
   companyName: string;
   purchasePrice: number;
   imageUrl: string;
+  industry: string;
   portfolioId: number;
 }

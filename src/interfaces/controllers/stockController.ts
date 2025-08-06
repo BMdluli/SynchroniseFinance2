@@ -98,6 +98,7 @@ export const getStocksHandler = async (req: any, res: Response) => {
         shares: stock.shares,
         imageUrl: stock.imageUrl,
         portfolioId: stock.portfolioId,
+        industry: stock.industry,
         currentPrice: stock.currentPrice,
       })),
     });

@@ -54,6 +54,7 @@ export const createUserStock = async (
     ...stockData,
     companyName: profile.companyName,
     imageUrl: profile.image,
+    industry: profile.industry || "",
   };
 
   const stock = await stockRepo.createStock(stockToCreate);

@@ -12,6 +12,7 @@ export class StockRepository {
           companyName: stockData.companyName || "",
           purchasePrice: stockData.purchasePrice,
           imageUrl: stockData.imageUrl!,
+          industry: stockData.industry || "",
           portfolioId: stockData.portfolioId,
         },
       });
