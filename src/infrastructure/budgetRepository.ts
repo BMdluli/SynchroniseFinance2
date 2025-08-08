@@ -39,6 +39,9 @@ export class BudgetRepository {
         userId,
         id: budgetId,
       },
+      include: {
+        budgetCategories: true,
+      },
     });
   }
 

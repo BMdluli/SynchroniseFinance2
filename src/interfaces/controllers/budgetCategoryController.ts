@@ -16,13 +16,14 @@ const CategorySchema = z.object({
 
 export const createCategoryHandler = async (req: any, res: Response) => {
   const parsed = CategorySchema.safeParse(req.body);
+  const userId = req.userInfo.id;
   if (!parsed.success) {
     return res
       .status(400)
       .json({ status: "fail", errors: parsed.error.flatten() });
   }
 
-  const category = await addCategory(parsed.data);
+  const category = await addCategory(userId, parsed.data);
   return res.status(201).json({ status: "success", data: category });
 };
 
