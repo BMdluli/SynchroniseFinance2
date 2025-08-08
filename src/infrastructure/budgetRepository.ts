@@ -13,6 +13,9 @@ export class BudgetRepository {
       where: {
         userId,
       },
+      include: {
+        budgetCategories: true,
+      },
     });
   }
 

@@ -14,14 +14,15 @@ export const getBudgetsHandler = async (req: any, res: Response) => {
   try {
     const userId = req.userInfo.id;
 
-    const budgets = await getBudgets(userId);
+    const result = await getBudgets(userId);
 
     res.status(200).json({
       status: "success",
-      data: budgets,
+      totalContributions: result.totalExpenses,
+      data: result.data,
     });
   } catch (e: any) {
-    console.log("Add contribution Error _>", e);
+    console.log("Get Budgets Error ->", e);
     return res.status(400).json({
       status: "fail",
       message: e.message || "Something went wrong",

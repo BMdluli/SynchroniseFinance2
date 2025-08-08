@@ -17,9 +17,37 @@ export const addBudget = async (budgetData: CreateBudgetDto) => {
 export const getBudgets = async (userId: number) => {
   const budgets = await budgetRepo.getBudgets(userId);
 
-  if (budgets.length === 0) return [];
+  if (budgets.length === 0) {
+    return {
+      totalExpenses: 0,
+      data: [],
+    };
+  }
 
-  return budgets;
+  // Add sum of `totalExpenses` amounts
+  const budgetsWithContributions = budgets.map((budget) => {
+    const totalExpenses =
+      budget.budgetCategories?.reduce((sum, category) => {
+        return sum + Number(category.amount || 0);
+      }, 0) || 0;
+
+    return {
+      ...budget,
+      totalExpenses,
+    };
+  });
+
+  const overallTotalContributions = budgetsWithContributions.reduce(
+    (sum, budget) => {
+      return sum + budget.totalExpenses;
+    },
+    0
+  );
+
+  return {
+    totalExpenses: overallTotalContributions,
+    data: budgetsWithContributions,
+  };
 };
 
 export const getBudget = async (userId: number, budgetId: number) => {
