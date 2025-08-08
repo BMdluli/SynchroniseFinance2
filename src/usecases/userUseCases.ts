@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
-
 import { UserRepository } from "../infrastructure/userRepoPrisma";
+import { ConflictError, UnauthorizedError } from "../utils/errors/CustomError";
 
 const userRepo = new UserRepository();
 
@@ -15,7 +15,7 @@ export const createUser = async ({
 }) => {
   const existingUser = await userRepo.findUserByEmail(email);
   if (existingUser) {
-    throw new Error("Email is already in use");
+    throw new ConflictError("Email is already in use");
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -32,17 +32,12 @@ export const createUser = async ({
 
 export const signInUser = async (email: string, password: string) => {
   const user = await userRepo.findUserByEmail(email);
-
-  if (!user) return null;
+  if (!user) throw new UnauthorizedError("Invalid email or password");
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) return null;
+  if (!isPasswordValid)
+    throw new UnauthorizedError("Invalid email or password");
 
-  // Omit password before returning
   const { password: _removed, ...safeUser } = user;
   return safeUser;
-};
-
-export const getAllUsers = async () => {
-  return userRepo.getAll();
 };
