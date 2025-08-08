@@ -1,17 +1,15 @@
-import { Response } from "express";
+import { Response, Request } from "express";
 import { addContribution } from "../../usecases/contributionUseCases";
 import { CreateContributionSchema } from "../../validators/CreateContributionSchema";
+import { AppError } from "../../utils/AppError";
+import { catchAsync } from "../../utils/catchAsync";
 
-export const addContributionHandler = async (req: any, res: Response) => {
-  try {
+export const addContributionHandler = catchAsync(
+  async (req: Request, res: Response) => {
     const parsed = CreateContributionSchema.safeParse(req.body);
 
     if (!parsed.success) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Invalid input",
-        errors: parsed.error.flatten(),
-      });
+      throw new AppError("Invalid input", 400, parsed.error.flatten());
     }
 
     const { amount, savingsId } = parsed.data;
@@ -19,25 +17,12 @@ export const addContributionHandler = async (req: any, res: Response) => {
     const contribution = await addContribution({
       amount,
       savingId: savingsId,
-      userId: req.userInfo.id,
+      userId: (req as any).userInfo.id,
     });
-
-    if (!contribution) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Something went wrong while trying to add your contribution",
-      });
-    }
 
     res.status(201).json({
       status: "success",
       data: contribution,
     });
-  } catch (e: any) {
-    console.log("Add contribution Error _>", e);
-    return res.status(400).json({
-      status: "fail",
-      message: e.message || "Something went wrong",
-    });
   }
-};
+);
