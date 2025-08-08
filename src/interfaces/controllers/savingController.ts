@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { SavingRepository } from "../../infrastructure/savingRepoPrisma";
 import {
   createSaving,
@@ -12,10 +12,13 @@ import { UpdateSavingSchema } from "../../validators/updateSavingSchema";
 
 const savingRepo = new SavingRepository();
 
-export const createSavingHandler = async (req: any, res: Response) => {
+export const createSavingHandler = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const parsed = CreateSavingSchema.safeParse(req.body);
-
     if (!parsed.success) {
       return res.status(400).json({
         status: "fail",
@@ -37,30 +40,23 @@ export const createSavingHandler = async (req: any, res: Response) => {
 
     const saving = await createSaving(savingData);
 
-    if (!saving) {
-      return res.status(400).json({
-        status: "fail",
-        message:
-          "Something went wrong while creating your savings goal please try again later",
-      });
-    }
-
     res.status(201).json({
-      status: "successs",
+      status: "success",
       data: saving,
     });
   } catch (e) {
-    res.status(500).json({
-      status: "fail",
-      message: "Something went wrong",
-    });
+    next(e);
   }
 };
 
-export const updateSavingHandler = async (req: any, res: Response) => {
+export const updateSavingHandler = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const savingId = Number(req.params.savingsId);
-    const userId = req.userInfo?.userId;
+    const userId = req.userInfo?.id;
 
     if (!savingId || isNaN(savingId)) {
       return res.status(400).json({
@@ -69,7 +65,6 @@ export const updateSavingHandler = async (req: any, res: Response) => {
       });
     }
 
-    // ✅ Validate with Zod
     const parsed = UpdateSavingSchema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({
@@ -80,26 +75,14 @@ export const updateSavingHandler = async (req: any, res: Response) => {
     }
 
     const updateData = parsed.data;
-
     const updated = await updateSaving(savingId, userId, updateData);
-
-    if (!updated) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Saving goal not found or not authorized",
-      });
-    }
 
     return res.status(200).json({
       status: "success",
       data: updated,
     });
   } catch (error) {
-    console.error("UPDATE SAVING ERROR ❌", error);
-    return res.status(500).json({
-      status: "fail",
-      message: "Something went wrong",
-    });
+    next(error);
   }
 };
 
@@ -120,68 +103,51 @@ export const getSavingsHandler = async (req: any, res: Response) => {
   }
 };
 
-export const getSavingHandler = async (req: any, res: Response) => {
+export const getSavingHandler = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const { savingsId } = req.params;
+    const savingsId = Number(req.params.savingsId);
 
-    const convertedSavingsId = Number(savingsId);
-    if (!convertedSavingsId) {
+    if (!savingsId) {
       return res.status(400).json({
         status: "fail",
-        message: `Please provide a correct savings id`,
+        message: "Invalid savings ID",
       });
     }
-    const saving = await getSaving(convertedSavingsId, req.userInfo.id);
 
-    if (!saving) {
-      return res.status(404).json({
-        status: "fail",
-        message: `Savings with the Id ${savingsId} not found`,
-      });
-    }
+    const saving = await getSaving(savingsId, req.userInfo.id);
 
     return res.status(200).json({
       status: "success",
       data: saving,
     });
   } catch (e) {
-    console.log("GET SAVING HANDLER ERROR _> ❌", e);
-    res.status(500).json({
-      status: "fail",
-      message: "Something went wrong",
-    });
+    next(e);
   }
 };
 
-export const deleteSavingHandler = async (req: any, res: Response) => {
+export const deleteSavingHandler = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const savingsId = req.params.savingsId;
+    const savingsId = Number(req.params.savingsId);
 
-    const convertedSavingsId = Number(savingsId);
-    if (!convertedSavingsId) {
+    if (!savingsId) {
       return res.status(400).json({
         status: "fail",
-        message: `Please provide a correct savings id`,
+        message: "Invalid savings ID",
       });
     }
 
-    console.log(convertedSavingsId);
-    console.log(req.userInfo.id);
-    const result = await deleteSaving(convertedSavingsId, req.userInfo.id);
+    await deleteSaving(savingsId, req.userInfo.id);
 
-    if (!result) {
-      return res.status(400).json({
-        status: "fail",
-        message: `Something went wrong trying to delete your savings goal`,
-      });
-    }
-
-    res.status(204).json();
+    return res.status(204).json();
   } catch (e) {
-    console.log("GET SAVING HANDLER ERROR _> ❌", e);
-    res.status(500).json({
-      status: "fail",
-      message: "Something went wrong",
-    });
+    next(e);
   }
 };
