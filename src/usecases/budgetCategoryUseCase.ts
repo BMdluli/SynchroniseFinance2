@@ -1,6 +1,7 @@
 import { CreateBudgetCategoryDto } from "../domain/dtos/CreateBudgetCategoryDto";
 import { BudgetCategoryRepository } from "../infrastructure/budgetCategoryRepo";
 import { BudgetRepository } from "../infrastructure/budgetRepository";
+import { AppError } from "../utils/AppError";
 
 const repo = new BudgetCategoryRepository();
 const budgetRepo = new BudgetRepository();
@@ -12,16 +13,15 @@ export const addCategory = async (
   const budget = await budgetRepo.getBudget(userId, data.budgetId);
 
   if (!budget) {
-    throw new Error("Budget not found");
+    throw new AppError("Budget not found", 404);
   }
 
-  // make sure that budget does not exceed the limit
   const totalAmount = budget.budgetCategories.reduce((sum, category) => {
     return sum + Number(category.amount || 0);
   }, 0);
 
   if (totalAmount + data.amount > Number(budget.totalIncome || 0)) {
-    throw new Error("Total budget amount exceeded");
+    throw new AppError("Total budget amount exceeded", 400);
   }
 
   return repo.addCategory(data);
@@ -32,7 +32,11 @@ export const getCategoriesByBudget = async (budgetId: number) => {
 };
 
 export const getCategory = async (id: number) => {
-  return repo.getCategory(id);
+  const category = await repo.getCategory(id);
+  if (!category) {
+    throw new AppError("Category not found", 404);
+  }
+  return category;
 };
 
 export const updateCategory = async (
@@ -43,5 +47,9 @@ export const updateCategory = async (
 };
 
 export const deleteCategory = async (id: number) => {
-  return repo.deleteCategory(id);
+  const deleted = await repo.deleteCategory(id);
+  if (!deleted) {
+    throw new AppError("Category not found", 404);
+  }
+  return deleted;
 };

@@ -7,6 +7,8 @@ import {
   deleteCategory,
 } from "../../usecases/budgetCategoryUseCase";
 import { z } from "zod";
+import { catchAsync } from "../../utils/catchAsync";
+import { AppError } from "../../utils/AppError";
 
 const CategorySchema = z.object({
   name: z.string(),
@@ -14,55 +16,69 @@ const CategorySchema = z.object({
   budgetId: z.number(),
 });
 
-export const createCategoryHandler = async (req: any, res: Response) => {
-  const parsed = CategorySchema.safeParse(req.body);
-  const userId = req.userInfo.id;
-  if (!parsed.success) {
-    return res
-      .status(400)
-      .json({ status: "fail", errors: parsed.error.flatten() });
+export const createCategoryHandler = catchAsync(
+  async (req: any, res: Response) => {
+    const parsed = CategorySchema.safeParse(req.body);
+    const userId = req.userInfo.id;
+
+    if (!parsed.success) {
+      throw new AppError("Invalid input", 400, parsed.error.flatten());
+    }
+
+    const category = await addCategory(userId, parsed.data);
+    res.status(201).json({ status: "success", data: category });
   }
+);
 
-  const category = await addCategory(userId, parsed.data);
-  return res.status(201).json({ status: "success", data: category });
-};
+export const getCategoriesHandler = catchAsync(
+  async (req: any, res: Response) => {
+    const { budgetId } = req.params;
 
-export const getCategoriesHandler = async (req: any, res: Response) => {
-  const { budgetId } = req.params;
+    if (!Number(budgetId)) {
+      throw new AppError("Invalid budget ID", 400);
+    }
 
-  const categories = await getCategoriesByBudget(Number(budgetId));
-  return res.status(200).json({ status: "success", data: categories });
-};
-
-export const getCategoryHandler = async (req: any, res: Response) => {
-  const { categoryId } = req.params;
-  const category = await getCategory(Number(categoryId));
-  if (!category) {
-    return res
-      .status(404)
-      .json({ status: "fail", message: "Category not found" });
+    const categories = await getCategoriesByBudget(Number(budgetId));
+    res.status(200).json({ status: "success", data: categories });
   }
+);
 
-  return res.status(200).json({ status: "success", data: category });
-};
+export const getCategoryHandler = catchAsync(
+  async (req: any, res: Response) => {
+    const { categoryId } = req.params;
 
-export const updateCategoryHandler = async (req: any, res: Response) => {
-  const { categoryId } = req.params;
-  const data = req.body;
+    if (!Number(categoryId)) {
+      throw new AppError("Invalid category ID", 400);
+    }
 
-  const category = await updateCategory(Number(categoryId), data);
-  return res.status(200).json({ status: "success", data: category });
-};
+    const category = await getCategory(Number(categoryId));
+    res.status(200).json({ status: "success", data: category });
+  }
+);
 
-export const deleteCategoryHandler = async (req: any, res: Response) => {
-  const { categoryId } = req.params;
+export const updateCategoryHandler = catchAsync(
+  async (req: any, res: Response) => {
+    const { categoryId } = req.params;
+    const data = req.body;
 
-  try {
+    if (!Number(categoryId)) {
+      throw new AppError("Invalid category ID", 400);
+    }
+
+    const updated = await updateCategory(Number(categoryId), data);
+    res.status(200).json({ status: "success", data: updated });
+  }
+);
+
+export const deleteCategoryHandler = catchAsync(
+  async (req: any, res: Response) => {
+    const { categoryId } = req.params;
+
+    if (!Number(categoryId)) {
+      throw new AppError("Invalid category ID", 400);
+    }
+
     await deleteCategory(Number(categoryId));
-    return res.status(204).send();
-  } catch (e) {
-    return res
-      .status(404)
-      .json({ status: "fail", message: "Category not found" });
+    res.status(204).send();
   }
-};
+);
