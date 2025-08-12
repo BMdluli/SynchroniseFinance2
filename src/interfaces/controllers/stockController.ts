@@ -2,7 +2,7 @@ import { Response } from "express";
 import { CreateStockSchema } from "../../validators/CreateStockSchema";
 import {
   bulkDeleteUserStocks,
-  bulkUpdateUserStocks,
+  // bulkUpdateUserStocks,
   createUserStock,
   deleteUserStock,
   getUserStock,

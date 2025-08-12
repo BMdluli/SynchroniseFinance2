@@ -172,24 +172,24 @@ export const bulkDeleteUserStocks = async (
   return result.count; // number of deleted stocks
 };
 
-export const bulkUpdateUserStocks = async (
-  userId: number,
-  stockIds: number[],
-  portfolioId: number,
-  updateData: Partial<Stock>
-) => {
-  const portfolio = await portfolioRepo.findPortfolioById(portfolioId, userId);
-  if (!portfolio) {
-    throw new Error("Unauthorized access to this portfolio");
-  }
+// export const bulkUpdateUserStocks = async (
+//   userId: number,
+//   stockIds: number[],
+//   portfolioId: number,
+//   updateData: Partial<Stock>
+// ) => {
+//   const portfolio = await portfolioRepo.findPortfolioById(portfolioId, userId);
+//   if (!portfolio) {
+//     throw new Error("Unauthorized access to this portfolio");
+//   }
 
-  const result = await stockRepo.updateManyStocks(
-    stockIds,
-    portfolioId,
-    updateData
-  );
-  return result.count; // number of updated stocks
-};
+//   const result = await stockRepo.updateManyStocks(
+//     stockIds,
+//     portfolioId,
+//     updateData
+//   );
+//   return result.count; // number of updated stocks
+// };
 
 export const searchForStock = async (
   companyName: string
