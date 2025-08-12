@@ -1,6 +1,8 @@
 import { Response } from "express";
 import { CreateStockSchema } from "../../validators/CreateStockSchema";
 import {
+  bulkDeleteUserStocks,
+  bulkUpdateUserStocks,
   createUserStock,
   deleteUserStock,
   getUserStock,
@@ -11,6 +13,8 @@ import {
 import { PortfolioRepository } from "../../infrastructure/portfolioRepoPrisma";
 import { stockCache } from "../../utils/cache";
 import axios from "axios";
+import { UpdateSavingSchema } from "../../validators/updateSavingSchema";
+import { UpdateStockSchema } from "../../validators/updateStockSchema";
 
 const portfolioRepo = new PortfolioRepository();
 
@@ -133,9 +137,17 @@ export const updateStockHandler = async (req: any, res: Response) => {
     const stockId = Number(req.params.stockId);
     const userId = req.userInfo?.id;
 
-    const updateFields = req.body;
+    const parsed = UpdateStockSchema.safeParse(req.body);
 
-    const updated = await updateUserStock(userId, stockId, updateFields);
+    if (!parsed.success) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Invalid input",
+        errors: parsed.error.flatten(),
+      });
+    }
+
+    const updated = await updateUserStock(userId, stockId, parsed.data);
 
     return res.status(200).json({
       status: "success",
@@ -243,5 +255,20 @@ export const getMarketIndexesHandler = async (req: any, res: Response) => {
           ? "FMP API limit reached or unauthorized"
           : "Failed to fetch ETF market index data",
     });
+  }
+};
+
+export const deleteManyStocksHandler = async (req: any, res: Response) => {
+  try {
+    const { stockIds, portfolioId } = req.body;
+    console.log(stockIds);
+    const deletedCount = await bulkDeleteUserStocks(
+      req.userInfo.id,
+      stockIds,
+      portfolioId
+    );
+    res.status(200).json({ status: "success", deletedCount });
+  } catch (e: any) {
+    res.status(400).json({ status: "fail", message: e.message });
   }
 };

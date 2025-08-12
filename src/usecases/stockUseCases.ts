@@ -136,20 +136,7 @@ export const updateUserStock = async (
     throw new Error("Unauthorized access to stock");
   }
 
-  let stockToUpdate = {};
-
-  // TODO: -> refactor
-  if (updateData.symbol) {
-    const profile = await getCompanyProfile(updateData);
-
-    stockToUpdate = {
-      ...updateData,
-      companyName: profile.companyName,
-      imageUrl: profile.image,
-    };
-  }
-
-  return await stockRepo.updateStock(stockId, stockToUpdate);
+  return await stockRepo.updateStock(stockId, updateData);
 };
 
 export const deleteUserStock = async (
@@ -168,6 +155,40 @@ export const deleteUserStock = async (
 
   await stockRepo.deleteStock(stockId);
   return true;
+};
+
+export const bulkDeleteUserStocks = async (
+  userId: number,
+  stockIds: number[],
+  portfolioId: number
+) => {
+  const portfolio = await portfolioRepo.findPortfolioById(portfolioId, userId);
+  if (!portfolio) {
+    throw new Error("Unauthorized access to this portfolio");
+  }
+
+  const result = await stockRepo.deleteManyStocks(stockIds, portfolioId);
+  console.log(result);
+  return result.count; // number of deleted stocks
+};
+
+export const bulkUpdateUserStocks = async (
+  userId: number,
+  stockIds: number[],
+  portfolioId: number,
+  updateData: Partial<Stock>
+) => {
+  const portfolio = await portfolioRepo.findPortfolioById(portfolioId, userId);
+  if (!portfolio) {
+    throw new Error("Unauthorized access to this portfolio");
+  }
+
+  const result = await stockRepo.updateManyStocks(
+    stockIds,
+    portfolioId,
+    updateData
+  );
+  return result.count; // number of updated stocks
 };
 
 export const searchForStock = async (

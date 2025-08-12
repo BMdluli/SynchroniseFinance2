@@ -61,4 +61,13 @@ export class StockRepository {
       where: { id: stockId },
     });
   }
+
+  async deleteManyStocks(stockIds: number[], portfolioId: number) {
+    return await prisma.stock.deleteMany({
+      where: {
+        id: { in: stockIds },
+        portfolioId,
+      },
+    });
+  }
 }

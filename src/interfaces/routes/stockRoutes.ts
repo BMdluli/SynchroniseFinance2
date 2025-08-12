@@ -2,6 +2,7 @@ import { Router } from "express";
 import { authMiddleware } from "../middleware/authMiddleware";
 import {
   createStockHandler,
+  deleteManyStocksHandler,
   deleteStockHandler,
   getMarketIndexesHandler,
   getStockHandler,
@@ -16,6 +17,7 @@ router.get("/stocks", authMiddleware, getStocksHandler);
 router.post("/stocks", authMiddleware, createStockHandler);
 router.get("/stocks/search", authMiddleware, searchStockHandler);
 router.get("/stocks/market-indexes", authMiddleware, getMarketIndexesHandler);
+router.delete("/stocks/bulk", authMiddleware, deleteManyStocksHandler);
 router.get("/stocks/:stockId", authMiddleware, getStockHandler);
 router.patch("/stocks/:stockId", authMiddleware, updateStockHandler);
 router.delete("/stocks/:stockId", authMiddleware, deleteStockHandler);
