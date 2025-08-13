@@ -61,6 +61,7 @@ model Stock {
   industry       String
   createdAt      DateTime @default(now())
   updatedAt      DateTime @default(now())
+  dividendYield  Float? @default(0) 
 
   portfolioId    Int
   portfolio      Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)

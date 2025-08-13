@@ -14,6 +14,7 @@ export class StockRepository {
           imageUrl: stockData.imageUrl!,
           industry: stockData.industry || "",
           portfolioId: stockData.portfolioId,
+          dividendYield: stockData.dividendYield || 0,
         },
       });
     } catch (error) {

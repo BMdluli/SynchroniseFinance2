@@ -94,17 +94,7 @@ export const getStocksHandler = async (req: any, res: Response) => {
 
     return res.status(200).json({
       status: "success",
-      data: stocks.map((stock) => ({
-        id: stock.id,
-        symbol: stock.symbol,
-        companyName: stock.companyName,
-        purchasePrice: stock.purchasePrice,
-        shares: stock.shares,
-        imageUrl: stock.imageUrl,
-        portfolioId: stock.portfolioId,
-        industry: stock.industry,
-        currentPrice: stock.currentPrice,
-      })),
+      data: stocks,
     });
   } catch (error: any) {
     console.error("Error fetching stocks:", error);

@@ -7,6 +7,7 @@ import { stockCache } from "../utils/cache";
 import { CompanyPortfolio } from "../domain/CompanyPortfolio";
 import { Stock } from "../domain/Stock";
 import { SearchResult } from "../domain/SearchResult";
+import yahooFinance from "yahoo-finance2";
 
 const stockRepo = new StockRepository();
 const portfolioRepo = new PortfolioRepository();
@@ -24,6 +25,45 @@ const getCompanyProfile = async (inputData: Partial<CreateStockDto>) => {
   return profile;
 };
 
+export const getDividendYield = async (symbol: string): Promise<number> => {
+  try {
+    const today = new Date();
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(today.getFullYear() - 1);
+
+    // 1. Get dividend history for the past year
+    const history = await yahooFinance.historical(symbol, {
+      period1: oneYearAgo,
+      period2: today,
+      events: "dividends",
+    });
+
+    if (!history || history.length === 0) {
+      console.warn(`No dividends found for ${symbol} in the past year`);
+      return 0;
+    }
+
+    // 2. Sum up dividends
+    const totalDividends = history.reduce(
+      (sum, d) => sum + (d.dividends || 0),
+      0
+    );
+
+    // 3. Get current price
+    const quote = await yahooFinance.quote(symbol);
+    const currentPrice = quote?.regularMarketPrice ?? 0;
+
+    if (!currentPrice || totalDividends === 0) return 0;
+
+    // 4. Calculate dividend yield as percentage
+    const yieldPercent = (totalDividends / currentPrice) * 100;
+    return Number(yieldPercent.toFixed(2));
+  } catch (err: any) {
+    console.error(`Error fetching dividend yield for ${symbol}:`, err.message);
+    return 0;
+  }
+};
+
 export const createUserStock = async (
   stockData: CreateStockDto,
   userId: number,
@@ -34,31 +74,29 @@ export const createUserStock = async (
     userId
   );
 
-  if (!portfolio) {
-    throw new Error(
-      "The portfolio you are trying to add to does not exist or you do not have access"
-    );
-  }
+  if (!portfolio) throw new Error("Portfolio not found or no access");
 
-  const whitelistedEmails = (process.env.WHITELIST_EMAIL || "").split(",");
-
-  const isPremiumUser = whitelistedEmails.includes(email);
-
-  if (!isPremiumUser && portfolio.stocks.length >= 3) {
+  const isPremiumUser = (process.env.WHITELIST_EMAIL || "")
+    .split(",")
+    .includes(email);
+  if (!isPremiumUser && portfolio.stocks.length >= 3)
     throw new Error("Only premium users can have more than 3 stocks");
-  }
 
-  const profile = await getCompanyProfile(stockData);
+  // Fetch profile and dividend yield in parallel
+  const [profile, dividendYield] = await Promise.all([
+    getCompanyProfile(stockData),
+    getDividendYield(stockData.symbol),
+  ]);
 
   const stockToCreate = {
     ...stockData,
     companyName: profile.companyName,
     imageUrl: profile.image,
     industry: profile.industry || "",
+    dividendYield: dividendYield || 0,
   };
 
-  const stock = await stockRepo.createStock(stockToCreate);
-  return stock;
+  return stockRepo.createStock(stockToCreate);
 };
 
 export const getUserStocks = async (portfolioId: number) => {

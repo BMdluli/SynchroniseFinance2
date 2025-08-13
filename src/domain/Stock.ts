@@ -6,4 +6,5 @@ export interface Stock {
   imageUrl: string;
   industry: string;
   portfolioId: number;
+  dividendYield?: number;
 }
