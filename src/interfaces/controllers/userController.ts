@@ -41,32 +41,37 @@ export const checkAuth = async (req: Request, res: Response) => {
 };
 
 export const createUserHandler = async (req: Request, res: Response) => {
-  const { email, password, username } = req.body;
-  if (!email || !password || !username) {
-    return res.status(400).json({
-      status: "fail",
-      message: "All fields are required.",
-    });
-  }
-
-  const newUser = await createUser({ email, password, username });
-
-  res.cookie(
-    "access_token",
-    generateToken(newUser.id, newUser.email, newUser.username),
-    {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 60 * 60 * 1000,
+  try {
+    const { email, password, username } = req.body;
+    if (!email || !password || !username) {
+      return res.status(400).json({
+        status: "fail",
+        message: "All fields are required.",
+      });
     }
-  );
 
-  res.status(201).json({
-    status: "success",
-    message: "User created successfully",
-    user: newUser,
-  });
+    const newUser = await createUser({ email, password, username });
+
+    res.cookie(
+      "access_token",
+      generateToken(newUser.id, newUser.email, newUser.username),
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 60 * 60 * 1000,
+      }
+    );
+
+    res.status(201).json({
+      status: "success",
+      message: "User created successfully",
+      user: newUser,
+    });
+  } catch (err: any) {
+    console.error(err);
+    res.status(400).json({ error: "Failed to create user" });
+  }
 };
 
 export const loginUser = async (req: Request, res: Response) => {
@@ -107,8 +112,8 @@ export const loginUser = async (req: Request, res: Response) => {
       status: "success",
       message: "logged in successfully",
     });
-  } catch (err) {
+  } catch (err: any) {
     console.error(err);
-    res.status(500).json({ error: "Failed to create user" });
+    res.status(400).json({ error: "Failed to login user" });
   }
 };
