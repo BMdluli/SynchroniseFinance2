@@ -16,6 +16,7 @@ const getCookieOptions = (): CookieOptions => ({
   secure: true,
   sameSite: "none",
   maxAge: 60 * 60 * 1000, // 1 hour
+  domain: "https://sync-finance.netlify.app",
 });
 
 export const checkAuth = async (req: Request, res: Response) => {
