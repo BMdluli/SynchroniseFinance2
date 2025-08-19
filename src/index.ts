@@ -23,6 +23,7 @@ app.use(
       "http://localhost:5173",
       "http://localhost:5174",
       "https://sync-finance.vercel.app",
+      "https://sync-finance.netlify.app",
     ],
     credentials: true,
   })
