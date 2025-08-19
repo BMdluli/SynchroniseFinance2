@@ -1,21 +1,25 @@
-import { Request, Response } from "express";
+import { CookieOptions, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-
 import { createUser, signInUser } from "../../usecases/userUseCases";
 
 const generateToken = (userId: number, email: string, username: string) => {
-  const jwtExpiresIn = "60m";
-
+  const jwtExpiresIn = "60m"; // 1 hour
   return jwt.sign(
-    { id: userId, email: email, username: username },
+    { id: userId, email, username },
     process.env.JWT_SECRET as string,
     { expiresIn: jwtExpiresIn }
   );
 };
 
+const getCookieOptions = (): CookieOptions => ({
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+  maxAge: 60 * 60 * 1000, // 1 hour
+});
+
 export const checkAuth = async (req: Request, res: Response) => {
   try {
-    console.log(req.cookies.access_token);
     const token = req.cookies.access_token;
 
     if (!token) {
@@ -27,11 +31,16 @@ export const checkAuth = async (req: Request, res: Response) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
       id: number;
       email: string;
+      username: string;
     };
 
     res.status(200).json({
       authenticated: true,
-      user: { id: decoded.id, email: decoded.email },
+      user: {
+        id: decoded.id,
+        email: decoded.email,
+        username: decoded.username,
+      },
     });
   } catch (err) {
     return res
@@ -55,13 +64,7 @@ export const createUserHandler = async (req: Request, res: Response) => {
     res.cookie(
       "access_token",
       generateToken(newUser.id, newUser.email, newUser.username),
-      {
-        httpOnly: true,
-        // secure: process.env.NODE_ENV === "production",
-        secure: true,
-        sameSite: "none",
-        maxAge: 60 * 60 * 1000,
-      }
+      getCookieOptions()
     );
 
     res.status(201).json({
@@ -80,39 +83,30 @@ export const loginUser = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      res.status(401).json({
+      return res.status(401).json({
         status: "fail",
         message: "Please ensure that your details are correct and try again",
       });
-      return;
     }
 
     const userFromDb = await signInUser(email, password);
 
     if (!userFromDb) {
-      res.status(401).json({
+      return res.status(401).json({
         status: "fail",
         message: "Please ensure that your details are correct and try again",
       });
-      return;
     }
 
-    // Set token in cookie
     res.cookie(
       "access_token",
       generateToken(userFromDb.id, userFromDb.email, userFromDb.username),
-      {
-        httpOnly: true,
-        secure: true,
-        // secure: process.env.NODE_ENV === "production", // true on HTTPS
-        sameSite: "none",
-        maxAge: 60 * 60 * 1000, // 15 minutes
-      }
+      getCookieOptions()
     );
 
     res.status(200).json({
       status: "success",
-      message: "logged in successfully",
+      message: "Logged in successfully",
     });
   } catch (err: any) {
     console.error(err);
