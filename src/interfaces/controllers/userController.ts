@@ -58,7 +58,7 @@ export const createUserHandler = async (req: Request, res: Response) => {
       {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "none",
         maxAge: 60 * 60 * 1000,
       }
     );
@@ -103,7 +103,7 @@ export const loginUser = async (req: Request, res: Response) => {
       {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production", // true on HTTPS
-        sameSite: "strict",
+        sameSite: "none",
         maxAge: 60 * 60 * 1000, // 15 minutes
       }
     );
