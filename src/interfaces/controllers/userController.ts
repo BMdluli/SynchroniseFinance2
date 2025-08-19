@@ -57,7 +57,8 @@ export const createUserHandler = async (req: Request, res: Response) => {
       generateToken(newUser.id, newUser.email, newUser.username),
       {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        // secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "none",
         maxAge: 60 * 60 * 1000,
       }
@@ -102,7 +103,8 @@ export const loginUser = async (req: Request, res: Response) => {
       generateToken(userFromDb.id, userFromDb.email, userFromDb.username),
       {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production", // true on HTTPS
+        secure: true,
+        // secure: process.env.NODE_ENV === "production", // true on HTTPS
         sameSite: "none",
         maxAge: 60 * 60 * 1000, // 15 minutes
       }
