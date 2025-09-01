@@ -11,13 +11,22 @@ const generateToken = (userId: number, email: string, username: string) => {
   );
 };
 
-const getCookieOptions = (): CookieOptions => ({
-  httpOnly: true,
-  secure: true,
-  sameSite: "none",
-  maxAge: 60 * 60 * 1000, // 1 hour
-  domain: "https://sync-finance.vercel.app",
-});
+const getCookieOptions = (): CookieOptions => {
+  const isProduction = process.env.NODE_ENV === "production";
+  const cookieOptions: CookieOptions = {
+    httpOnly: true,
+    secure: isProduction, // Set secure only in production
+    sameSite: "none",
+    maxAge: 60 * 60 * 1000, // 1 hour
+  };
+
+  // Only set the domain explicitly in production
+  if (isProduction) {
+    cookieOptions.domain = "sync-finance.vercel.app";
+  }
+
+  return cookieOptions;
+};
 
 export const checkAuth = async (req: Request, res: Response) => {
   try {
