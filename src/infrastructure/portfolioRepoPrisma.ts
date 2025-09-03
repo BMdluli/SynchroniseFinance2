@@ -26,10 +26,10 @@ export class PortfolioRepository {
     });
   }
 
-  async updatePortfolio(userId: number, id: number, newName: string) {
+  async updatePortfolio(userId: number, id: number, data: any) {
     return await prisma.portfolio.update({
       where: { id },
-      data: { name: newName },
+      data: data,
     });
   }
 

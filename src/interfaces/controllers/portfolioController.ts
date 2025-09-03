@@ -2,6 +2,7 @@ import { Response } from "express";
 import {
   addPortfolio,
   deleteUserPortfolio,
+  getAIStockAnalysis,
   getUserPortfolio,
   getUserPortfolios,
   updateUserPortfolio,
@@ -85,3 +86,25 @@ export const updatePortfolio = catchAsync(async (req: any, res: Response) => {
     data: updated,
   });
 });
+
+export const getAIStockAnalysisHandler = async (req: any, res: Response) => {
+  try {
+    const { portfolioId } = req.body;
+    if (!portfolioId || isNaN(portfolioId)) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Please provide a valid portfolio ID",
+      });
+    }
+
+    await getAIStockAnalysis(req.userInfo.id, portfolioId);
+
+    res
+      .status(201)
+      .json({ message: "AI stock analysis generated successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Failed to get AI stock analysis", e: error });
+  }
+};

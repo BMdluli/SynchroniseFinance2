@@ -14,8 +14,8 @@ const generateToken = (userId: number, email: string, username: string) => {
 const getCookieOptions = (): CookieOptions => {
   const isProduction = process.env.NODE_ENV === "production";
   const cookieOptions: CookieOptions = {
-    httpOnly: true,
-    secure: isProduction, // Set secure only in production
+    httpOnly: false,
+    secure: true, // ALWAYS set secure: true when sameSite is 'none'
     sameSite: "none",
     maxAge: 60 * 60 * 1000, // 1 hour
   };
@@ -108,16 +108,17 @@ export const loginUser = async (req: Request, res: Response) => {
       });
     }
 
-    res.cookie(
-      "access_token",
-      generateToken(userFromDb.id, userFromDb.email, userFromDb.username),
-      getCookieOptions()
-    );
-
-    res.status(200).json({
-      status: "success",
-      message: "Logged in successfully",
-    });
+    res
+      .cookie(
+        "access_token",
+        generateToken(userFromDb.id, userFromDb.email, userFromDb.username),
+        getCookieOptions()
+      )
+      .status(200)
+      .json({
+        status: "success",
+        message: "Logged in successfully",
+      });
   } catch (err: any) {
     console.error(err);
     res.status(400).json({ error: "Failed to login user" });
