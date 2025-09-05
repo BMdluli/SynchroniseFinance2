@@ -51,6 +51,7 @@ model Portfolio {
   name        String
   createdAt   DateTime @default(now())
   aiOverview  String?
+  tokenCount  Int      @default(3)
 
   userId      Int
   user        User  @relation(fields: [userId], references: [id])

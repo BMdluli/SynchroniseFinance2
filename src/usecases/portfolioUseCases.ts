@@ -56,29 +56,52 @@ export const getAIStockAnalysis = async (
   userId: number,
   portfolioId: number
 ) => {
-  const userStocks = await stockRepo.getAllStocks(portfolioId);
+  try {
+    const [userStocks, portfolio] = await Promise.all([
+      stockRepo.getAllStocks(portfolioId),
+      portfolioRepo.findPortfolioById(portfolioId, userId),
+    ]);
 
-  if (userStocks.length < 1) {
-    throw new Error("No stocks found for analysis.");
+    if (!portfolio) {
+      throw new AppError(
+        `Portfolio with ID ${portfolioId} not found or user ${userId} is unauthorized.`,
+        401
+      );
+    }
+
+    if (userStocks.length < 1) {
+      throw new AppError(
+        `No stocks found for analysis in portfolio ${portfolioId}.`,
+        400
+      );
+    }
+
+    if (portfolio.tokenCount <= 0) {
+      throw new AppError(
+        `You have ran out of analysis tokens for this portfolio"${portfolio.name}."`,
+        403
+      );
+    }
+
+    const symbols = userStocks.map((stock) => stock.symbol);
+
+    const message = await getAiOverview(symbols);
+
+    console.log(message);
+
+    if (!message) {
+      throw new AppError("Something went wrong with AI analysis", 500);
+    }
+
+    await portfolioRepo.updatePortfolio(userId, portfolioId, {
+      aiOverview: message,
+      tokenCount: { decrement: 1 },
+    });
+
+    return true;
+  } catch (error) {
+    throw error;
   }
-
-  console.log(userStocks.length);
-
-  const symbols = userStocks.map((stock) => stock.symbol);
-
-  const message = await getAiOverview(symbols);
-
-  console.log(message);
-
-  if (!message) {
-    throw new Error("Failed to get AI analysis");
-  }
-
-  await portfolioRepo.updatePortfolio(userId, portfolioId, {
-    aiOverview: message,
-  });
-
-  return true;
 };
 
 async function getAiOverview(stockData: string[]) {
