@@ -71,7 +71,7 @@ export const getAIStockAnalysis = async (
 
     if (userStocks.length < 1) {
       throw new AppError(
-        `No stocks found for analysis in portfolio ${portfolioId}.`,
+        `No stocks found for analysis in ${portfolio.name}.`,
         400
       );
     }
@@ -125,7 +125,7 @@ async function getAiOverview(stockData: string[]) {
             )}\n\nPlease provide a high-level analysis (trends, risks, opportunities).`,
           },
         ],
-        max_completion_tokens: 500,
+        max_completion_tokens: 1000,
         reasoning_effort: "minimal",
         verbosity: "low",
       },
