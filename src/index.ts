@@ -24,6 +24,7 @@ app.use(
       "http://localhost:5174",
       "https://sync-finance.vercel.app",
       "https://sync-finance.netlify.app",
+      "https://main.di1f5sgmei0vi.amplifyapp.com",
     ],
     credentials: true,
   })
