@@ -12,18 +12,18 @@ const generateToken = (userId: number, email: string, username: string) => {
 };
 
 const getCookieOptions = (): CookieOptions => {
-  const isProduction = process.env.NODE_ENV === "production";
+  // const isProduction = process.env.NODE_ENV === "production";
   const cookieOptions: CookieOptions = {
     httpOnly: false,
     secure: true, // ALWAYS set secure: true when sameSite is 'none'
     sameSite: "none",
-    maxAge: 60 * 60 * 1000, // 1 hour
+    maxAge: 3600000, // 1 hour
   };
 
   // Only set the domain explicitly in production
-  if (isProduction) {
-    cookieOptions.domain = "sync-finance.vercel.app";
-  }
+  // if (isProduction) {
+  //   cookieOptions.domain = "sync-finance.vercel.app";
+  // }
 
   return cookieOptions;
 };
