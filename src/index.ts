@@ -19,13 +19,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "https://sync-finance.vercel.app",
-      "https://sync-finance.netlify.app",
-      "https://main.di1f5sgmei0vi.amplifyapp.com",
-    ],
+    origin: ["http://localhost:5173", "www.synchronisefinance.com"],
     credentials: true,
   })
 );
