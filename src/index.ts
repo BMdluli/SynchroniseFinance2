@@ -19,7 +19,11 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "www.synchronisefinance.com"],
+    origin: [
+      "http://localhost:5173",
+      "https://www.synchronisefinance.com",
+      "https://synchronisefinance.com",
+    ],
     credentials: true,
   })
 );
