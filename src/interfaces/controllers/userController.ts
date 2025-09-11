@@ -15,10 +15,11 @@ const getCookieOptions = (): CookieOptions => {
   // const isProduction = process.env.NODE_ENV === "production";
   const cookieOptions: CookieOptions = {
     httpOnly: true,
-    secure: true, // ALWAYS set secure: true when sameSite is 'none'
+    secure: true,
     sameSite: "none",
     maxAge: 3600000, // 1 hour
     domain: ".synchronisefinance.com",
+    // ...(isProduction && { domain: ".synchronisefinance.com" }),
   };
 
   // Only set the domain explicitly in production
@@ -123,5 +124,20 @@ export const loginUser = async (req: Request, res: Response) => {
   } catch (err: any) {
     console.error(err);
     res.status(400).json({ error: "Failed to login user" });
+  }
+};
+
+export const logoutUserHandler = async (req: Request, res: Response) => {
+  try {
+    // clear cookie
+    res.clearCookie("access_token", getCookieOptions());
+    return res
+      .status(200)
+      .json({ status: "success", message: "Logged out successfully" });
+  } catch (err) {
+    console.error(err);
+    return res
+      .status(500)
+      .json({ status: "error", message: "Failed to log out" });
   }
 };
