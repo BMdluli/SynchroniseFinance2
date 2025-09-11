@@ -14,10 +14,11 @@ const generateToken = (userId: number, email: string, username: string) => {
 const getCookieOptions = (): CookieOptions => {
   // const isProduction = process.env.NODE_ENV === "production";
   const cookieOptions: CookieOptions = {
-    httpOnly: false,
+    httpOnly: true,
     secure: true, // ALWAYS set secure: true when sameSite is 'none'
     sameSite: "none",
     maxAge: 3600000, // 1 hour
+    domain: ".synchronisefinance.com",
   };
 
   // Only set the domain explicitly in production
