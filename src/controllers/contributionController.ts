@@ -1,8 +1,8 @@
 import { Response, Request } from "express";
-import { addContribution } from "../../usecases/contributionUseCases";
-import { CreateContributionSchema } from "../../validators/CreateContributionSchema";
-import { AppError } from "../../utils/AppError";
-import { catchAsync } from "../../utils/catchAsync";
+import { addContribution } from "../usecases/contributionUseCases";
+import { CreateContributionSchema } from "../validators/CreateContributionSchema";
+import { AppError } from "../utils/AppError";
+import { catchAsync } from "../utils/catchAsync";
 
 export const addContributionHandler = catchAsync(
   async (req: Request, res: Response) => {

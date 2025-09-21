@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { CreateStockSchema } from "../../validators/CreateStockSchema";
+import { CreateStockSchema } from "../validators/CreateStockSchema";
 import {
   bulkDeleteUserStocks,
   // bulkUpdateUserStocks,
@@ -9,12 +9,12 @@ import {
   getUserStocks,
   searchForStock,
   updateUserStock,
-} from "../../usecases/stockUseCases";
-import { PortfolioRepository } from "../../infrastructure/portfolioRepoPrisma";
-import { stockCache } from "../../utils/cache";
+} from "../usecases/stockUseCases";
+import { PortfolioRepository } from "../infrastructure/portfolioRepoPrisma";
+import { stockCache } from "../utils/cache";
 import axios from "axios";
-import { UpdateSavingSchema } from "../../validators/updateSavingSchema";
-import { UpdateStockSchema } from "../../validators/updateStockSchema";
+import { UpdateSavingSchema } from "../validators/updateSavingSchema";
+import { UpdateStockSchema } from "../validators/updateStockSchema";
 
 const portfolioRepo = new PortfolioRepository();
 

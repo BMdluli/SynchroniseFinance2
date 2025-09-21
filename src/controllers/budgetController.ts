@@ -6,11 +6,11 @@ import {
   getBudgets,
   updateBudget,
   copyBudget,
-} from "../../usecases/budgetUseCase";
-import { CreateBudgetSchema } from "../../validators/CreateBudgetSchema";
-import { CopyBudgetSchema } from "../../validators/CopyBudgetSchema";
-import { catchAsync } from "../../utils/catchAsync";
-import { AppError } from "../../utils/AppError";
+} from "../usecases/budgetUseCase";
+import { CreateBudgetSchema } from "../validators/CreateBudgetSchema";
+import { CopyBudgetSchema } from "../validators/CopyBudgetSchema";
+import { catchAsync } from "../utils/catchAsync";
+import { AppError } from "../utils/AppError";
 
 export const getBudgetsHandler = catchAsync(async (req: any, res: Response) => {
   const userId = req.userInfo.id;

@@ -1,14 +1,14 @@
 import { NextFunction, Request, Response } from "express";
-import { SavingRepository } from "../../infrastructure/savingRepoPrisma";
+import { SavingRepository } from "../infrastructure/savingRepoPrisma";
 import {
   createSaving,
   deleteSaving,
   getSaving,
   updateSaving,
-} from "../../usecases/savingUseCases";
-import { CreateSavingSchema } from "../../validators/CreateSavingSchema";
-import { CreateSavingDto } from "../../domain/dtos/CreateSavingDTO";
-import { UpdateSavingSchema } from "../../validators/updateSavingSchema";
+} from "../usecases/savingUseCases";
+import { CreateSavingSchema } from "../validators/CreateSavingSchema";
+import { CreateSavingDto } from "../models/dtos/CreateSavingDTO";
+import { UpdateSavingSchema } from "../validators/updateSavingSchema";
 
 const savingRepo = new SavingRepository();
 

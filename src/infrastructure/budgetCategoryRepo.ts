@@ -1,5 +1,5 @@
 import { prisma } from "../config/prisma";
-import { CreateBudgetCategoryDto } from "../domain/dtos/CreateBudgetCategoryDto";
+import { CreateBudgetCategoryDto } from "../models/dtos/CreateBudgetCategoryDto";
 
 export class BudgetCategoryRepository {
   async addCategory(data: CreateBudgetCategoryDto) {

@@ -2,15 +2,14 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-
-import userRoutes from "./interfaces/routes/userRoutes";
-import savingRoutes from "./interfaces/routes/savingRoutes";
-import contributionRoutes from "./interfaces/routes/contributionRoutes";
-import portfolioRoutes from "./interfaces/routes/portfolioRoutes";
-import stockRoutes from "./interfaces/routes/stockRoutes";
-import budgetRoutes from "./interfaces/routes/budgetRoutes";
-import budgetCategoryRoutes from "./interfaces/routes/budgetCategoryRoutes";
-import { errorHandler } from "./interfaces/middleware/errorHandler";
+import userRoutes from "./routes/userRoutes";
+import savingRoutes from "./routes/savingRoutes";
+import contributionRoutes from "./routes/contributionRoutes";
+import portfolioRoutes from "./routes/portfolioRoutes";
+import stockRoutes from "./routes/stockRoutes";
+import budgetRoutes from "./routes/budgetRoutes";
+import budgetCategoryRoutes from "./routes/budgetCategoryRoutes";
+import { errorHandler } from "./middleware/errorHandler";
 
 dotenv.config();
 

@@ -1,6 +1,6 @@
 import { prisma } from "../config/prisma";
 import { Prisma } from "@prisma/client";
-import { Stock } from "../domain/Stock";
+import { Stock } from "../models/Stock";
 
 export class StockRepository {
   async createStock(stockData: Stock) {

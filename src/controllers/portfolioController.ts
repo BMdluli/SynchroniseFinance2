@@ -6,10 +6,10 @@ import {
   getUserPortfolio,
   getUserPortfolios,
   updateUserPortfolio,
-} from "../../usecases/portfolioUseCases";
-import { CreatePortfolioSchema } from "../../validators/CreatePortfolioSchema";
-import { catchAsync } from "../../utils/catchAsync";
-import { AppError } from "../../utils/AppError";
+} from "../usecases/portfolioUseCases";
+import { CreatePortfolioSchema } from "../validators/CreatePortfolioSchema";
+import { catchAsync } from "../utils/catchAsync";
+import { AppError } from "../utils/AppError";
 
 export const addPortfolioHandler = catchAsync(
   async (req: any, res: Response) => {

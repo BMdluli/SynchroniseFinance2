@@ -1,6 +1,6 @@
 import { CookieOptions, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { createUser, signInUser } from "../../usecases/userUseCases";
+import { createUser, signInUser } from "../usecases/userUseCases";
 
 const generateToken = (userId: number, email: string, username: string) => {
   const jwtExpiresIn = "60m"; // 1 hour
@@ -12,20 +12,20 @@ const generateToken = (userId: number, email: string, username: string) => {
 };
 
 const getCookieOptions = (): CookieOptions => {
-  // const isProduction = process.env.NODE_ENV === "production";
+  const isProduction = process.env.NODE_ENV === "production";
   const cookieOptions: CookieOptions = {
     httpOnly: true,
     secure: true,
     sameSite: "none",
     maxAge: 3600000, // 1 hour
-    domain: ".synchronisefinance.com",
+    // domain: ".synchronisefinance.com",
     // ...(isProduction && { domain: ".synchronisefinance.com" }),
   };
 
   // Only set the domain explicitly in production
-  // if (isProduction) {
-  //   cookieOptions.domain = "sync-finance.vercel.app";
-  // }
+  if (isProduction) {
+    cookieOptions.domain = ".synchronisefinance.com";
+  }
 
   return cookieOptions;
 };

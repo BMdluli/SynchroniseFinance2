@@ -1,4 +1,4 @@
-import { CreateSavingDto } from "../domain/dtos/CreateSavingDTO";
+import { CreateSavingDto } from "../models/dtos/CreateSavingDTO";
 import { SavingRepository } from "../infrastructure/savingRepoPrisma";
 import { AppError } from "../utils/AppError";
 

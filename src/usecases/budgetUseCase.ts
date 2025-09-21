@@ -1,4 +1,4 @@
-import { CreateBudgetDto } from "../domain/dtos/CreateBudgetDto";
+import { CreateBudgetDto } from "../models/dtos/CreateBudgetDto";
 import { BudgetRepository } from "../infrastructure/budgetRepository";
 import { AppError } from "../utils/AppError";
 

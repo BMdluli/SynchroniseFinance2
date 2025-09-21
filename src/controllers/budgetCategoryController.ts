@@ -1,14 +1,15 @@
 import { Response } from "express";
+
+import { z } from "zod";
+import { catchAsync } from "../utils/catchAsync";
+import { AppError } from "../utils/AppError";
 import {
   addCategory,
+  deleteCategory,
   getCategoriesByBudget,
   getCategory,
   updateCategory,
-  deleteCategory,
-} from "../../usecases/budgetCategoryUseCase";
-import { z } from "zod";
-import { catchAsync } from "../../utils/catchAsync";
-import { AppError } from "../../utils/AppError";
+} from "../usecases/budgetCategoryUseCase";
 
 const CategorySchema = z.object({
   name: z.string(),

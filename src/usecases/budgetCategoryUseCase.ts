@@ -1,4 +1,4 @@
-import { CreateBudgetCategoryDto } from "../domain/dtos/CreateBudgetCategoryDto";
+import { CreateBudgetCategoryDto } from "../models/dtos/CreateBudgetCategoryDto";
 import { BudgetCategoryRepository } from "../infrastructure/budgetCategoryRepo";
 import { BudgetRepository } from "../infrastructure/budgetRepository";
 import { AppError } from "../utils/AppError";

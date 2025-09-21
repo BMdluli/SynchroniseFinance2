@@ -1,12 +1,12 @@
-import { CreateStockDto } from "../domain/dtos/CreateStockDto";
-import { Quote } from "../domain/Quote";
+import { CreateStockDto } from "../models/dtos/CreateStockDto";
+import { Quote } from "../models/Quote";
 import { PortfolioRepository } from "../infrastructure/portfolioRepoPrisma";
 import { StockRepository } from "../infrastructure/stockRepoPrisma";
 import axios from "axios";
 import { stockCache } from "../utils/cache";
-import { CompanyPortfolio } from "../domain/CompanyPortfolio";
-import { Stock } from "../domain/Stock";
-import { SearchResult } from "../domain/SearchResult";
+import { CompanyPortfolio } from "../models/CompanyPortfolio";
+import { Stock } from "../models/Stock";
+import { SearchResult } from "../models/SearchResult";
 import yahooFinance from "yahoo-finance2";
 
 const stockRepo = new StockRepository();
