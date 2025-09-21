@@ -27,13 +27,13 @@ app.use(
   })
 );
 
-app.use("/", userRoutes);
-app.use("/", savingRoutes);
-app.use("/", contributionRoutes);
-app.use("/", portfolioRoutes);
-app.use("/", stockRoutes);
-app.use("/", budgetRoutes);
-app.use("/", budgetCategoryRoutes);
+app.use("/api/v1/", userRoutes);
+app.use("/api/v1/", savingRoutes);
+app.use("/api/v1/", contributionRoutes);
+app.use("/api/v1/", portfolioRoutes);
+app.use("/api/v1/", stockRoutes);
+app.use("/api/v1/", budgetRoutes);
+app.use("/api/v1/", budgetCategoryRoutes);
 
 app.use(errorHandler);
 
